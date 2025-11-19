@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trouvez un Maçon près de chez vous | Devis Gratuit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-blue-200">
+  <div id="root"></div>
+  
+  <script>
+    const app = {
+      step: 1,
+      formData: {
+        typeTraux: '',
+        dimensions: '',
+        epaisseur: '',
+        natureMur: '',
+        adresse: '',
+        ville: '',
+        codePostal: '',
+        telephone: '',
+        email: ''
+      },
+      
+      projectTypes: [
+        { id: "mur", label: "Construction d'un mur", icon: "🧱" },
+        { id: "extension", label: "Extension de maison", icon: "🏠" },
+        { id: "renovation", label: "Rénovation", icon: "🎨" },
+        { id: "ouverture", label: "Ouverture dans un mur", icon: "🚪" },
+        { id: "autre", label: "Autre projet", icon: "🏗️" }
+      ],
+      
+      render() {
+        const root = document.getElementById('root');
+        
+        if (this.step === 1) {
+          root.innerHTML = `
+            <div class="min-h-screen p-4">
+              <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12 pt-8">
+                  <div class="inline-block bg-white p-4 rounded-full shadow-lg mb-4">
+                    <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                  </div>
+                  <h1 class="text-4xl font-bold text-gray-800 mb-3">
+                    Plateforme de mise en relation avec des Maçons de confiance
+                  </h1>
+                  <p class="text-xl text-gray-600">
+                    Trouvez un maçon en ligne • Devis maçonnerie gratuit • Artisans certifiés
+                  </p>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                  <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                    Quel type de travaux souhaitez-vous réaliser ?
+                  </h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${this.projectTypes.map(type => `
+                      <button onclick="app.selectProject('${type.label}')" class="flex items-center gap-4 p-6 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition">
+                        <span class="text-4xl">${type.icon}</span>
+                        <span class="text-lg font-semibold text-gray-700">${type.label}</span>
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        
+        else if (this.step === 2) {
+          const isRenov = this.formData.typeTraux === "Rénovation" || this.formData.typeTraux === "Autre projet";
+          const isExt = this.formData.typeTraux === "Extension de maison";
+          const isOuv = this.formData.typeTraux === "Ouverture dans un mur";
+          
+          root.innerHTML = `
+            <div class="min-h-screen p-4">
+              <div class="max-w-2xl mx-auto pt-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                  <div class="mb-6">
+                    <span class="bg-blue-600 text-white px-3 py-1 rounded-full font-semibold text-sm">Étape 2/3</span>
+                    <h2 class="text-2xl font-bold text-gray-800 mt-4">Précisez les détails de votre projet</h2>
+                  </div>
+
+                  <div class="space-y-6">
+                    ${isRenov ? `
+                      <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">📝 Description sommaire de votre projet</label>
+                        <textarea id="dimensions" rows="6" placeholder="Décrivez votre projet..." class="w-full px-4 py-3 border border-gray-300 rounded-lg">${this.formData.dimensions}</textarea>
+                      </div>
+                    ` : `
+                      <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">${isExt ? '📐 Surface (en m²)' : '📐 Dimensions (hauteur x largeur)'}</label>
+                        <input type="text" id="dimensions" value="${this.formData.dimensions}" placeholder="${isExt ? 'Ex: 25 m²' : 'Ex: 3m x 5m'}" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">${isExt ? '📏 Épaisseur mur souhaitée' : isOuv ? '📏 Épaisseur' : '📏 Épaisseur souhaitée'}</label>
+                        <select id="epaisseur" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                          <option value="">Sélectionnez...</option>
+                          <option value="10cm" ${this.formData.epaisseur === '10cm' ? 'selected' : ''}>10 cm</option>
+                          <option value="20cm" ${this.formData.epaisseur === '20cm' ? 'selected' : ''}>20 cm</option>
+                          <option value="30cm" ${this.formData.epaisseur === '30cm' ? 'selected' : ''}>30 cm</option>
+                          <option value="autre" ${this.formData.epaisseur === 'autre' ? 'selected' : ''}>Autre</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🧱 Nature du mur</label>
+                        <select id="natureMur" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                          <option value="">Sélectionnez...</option>
+                          <option value="parpaing" ${this.formData.natureMur === 'parpaing' ? 'selected' : ''}>Parpaing</option>
+                          <option value="brique" ${this.formData.natureMur === 'brique' ? 'selected' : ''}>Brique</option>
+                          <option value="pierre" ${this.formData.natureMur === 'pierre' ? 'selected' : ''}>Pierre</option>
+                          <option value="beton_cellulaire" ${this.formData.natureMur === 'beton_cellulaire' ? 'selected' : ''}>Béton cellulaire</option>
+                          <option value="beton_arme" ${this.formData.natureMur === 'beton_arme' ? 'selected' : ''}>Béton armé</option>
+                        </select>
+                      </div>
+                    `}
+
+                    <button onclick="app.nextStep()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg">
+                      Continuer →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        
+        else if (this.step === 3) {
+          root.innerHTML = `
+            <div class="min-h-screen p-4">
+              <div class="max-w-2xl mx-auto pt-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                  <div class="mb-6">
+                    <span class="bg-blue-600 text-white px-3 py-1 rounded-full font-semibold text-sm">Étape 3/3</span>
+                    <h2 class="text-2xl font-bold text-gray-800 mt-4">Vos coordonnées</h2>
+                  </div>
+
+                  <div class="space-y-6">
+                    <div>
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">📍 Adresse complète</label>
+                      <input type="text" id="adresse" value="${this.formData.adresse}" placeholder="12 rue..." class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🏙️ Ville</label>
+                        <input type="text" id="ville" value="${this.formData.ville}" placeholder="Lyon" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">📮 Code postal</label>
+                        <input type="text" id="codePostal" value="${this.formData.codePostal}" placeholder="69001" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                      </div>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">📞 Téléphone</label>
+                      <input type="tel" id="telephone" value="${this.formData.telephone}" placeholder="06 XX XX XX XX" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">📧 Email</label>
+                      <input type="email" id="email" value="${this.formData.email}" placeholder="email@exemple.fr" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                    </div>
+
+                    <button onclick="app.sendEmail()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg">
+                      Envoyer ma demande
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        
+        else if (this.step === 4) {
+          const isRenov = this.formData.typeTraux === "Rénovation" || this.formData.typeTraux === "Autre projet";
+          root.innerHTML = `
+            <div class="min-h-screen p-4 flex items-center justify-center">
+              <div class="bg-white rounded-2xl shadow-xl p-12 text-center max-w-lg">
+                <div class="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                  <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Merci pour votre demande !</h2>
+                <p class="text-lg text-gray-600 mb-4">Un conseiller va vous contacter sous <strong>24h</strong></p>
+                <p class="text-sm text-gray-500 mb-8">(sauf Dimanche et jours fériés)</p>
+                
+                <div class="bg-blue-50 rounded-lg p-6 mb-6 text-left">
+                  <h3 class="font-bold text-gray-800 mb-3">📋 Récapitulatif</h3>
+                  <div class="space-y-2 text-sm text-gray-700">
+                    <p><strong>Projet :</strong> ${this.formData.typeTraux}</p>
+                    ${isRenov ? `
+                      <p><strong>Description :</strong> ${this.formData.dimensions}</p>
+                    ` : `
+                      <p><strong>Dimensions :</strong> ${this.formData.dimensions}</p>
+                      <p><strong>Épaisseur :</strong> ${this.formData.epaisseur}</p>
+                      <p><strong>Nature :</strong> ${this.formData.natureMur}</p>
+                    `}
+                    <p><strong>Ville :</strong> ${this.formData.ville} (${this.formData.codePostal})</p>
+                    <p><strong>Téléphone :</strong> ${this.formData.telephone}</p>
+                  </div>
+                </div>
+
+                <button onclick="app.reset()" class="text-blue-600 hover:text-blue-700 font-semibold">
+                  ← Nouvelle demande
+                </button>
+              </div>
+            </div>
+          `;
+        }
+      },
+      
+      selectProject(type) {
+        this.formData.typeTraux = type;
+        this.step = 2;
+        this.render();
+      },
+      
+      nextStep() {
+        this.formData.dimensions = document.getElementById('dimensions').value;
+        const epaisseurEl = document.getElementById('epaisseur');
+        const natureMurEl = document.getElementById('natureMur');
+        if (epaisseurEl) this.formData.epaisseur = epaisseurEl.value;
+        if (natureMurEl) this.formData.natureMur = natureMurEl.value;
+        this.step = 3;
+        this.render();
+      },
+      
+      sendEmail() {
+        this.formData.adresse = document.getElementById('adresse').value;
+        this.formData.ville = document.getElementById('ville').value;
+        this.formData.codePostal = document.getElementById('codePostal').value;
+        this.formData.telephone = document.getElementById('telephone').value;
+        this.formData.email = document.getElementById('email').value;
+        
+        const isRenov = this.formData.typeTraux === "Rénovation" || this.formData.typeTraux === "Autre projet";
+        const subject = `Nouvelle demande: ${this.formData.typeTraux} - ${this.formData.ville}`;
+        const body = `NOUVELLE DEMANDE DE DEVIS MAÇONNERIE
+═════════════════════════════════════
+
+📋 TYPE DE PROJET
+${this.formData.typeTraux}
+
+📐 DÉTAILS
+${isRenov ? `Description: ${this.formData.dimensions}` : `Dimensions: ${this.formData.dimensions}
+Épaisseur: ${this.formData.epaisseur}
+Nature: ${this.formData.natureMur}`}
+
+📍 LOCALISATION
+Adresse: ${this.formData.adresse}
+Ville: ${this.formData.ville}
+Code postal: ${this.formData.codePostal}
+
+📞 CONTACT
+Téléphone: ${this.formData.telephone}
+Email: ${this.formData.email}
+
+Date: ${new Date().toLocaleString('fr-FR')}`;
+
+        window.location.href = `mailto:lyonmaconnerie@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        this.step = 4;
+        this.render();
+      },
+      
+      reset() {
+        this.step = 1;
+        this.formData = {typeTraux:'',dimensions:'',epaisseur:'',natureMur:'',adresse:'',ville:'',codePostal:'',telephone:'',email:''};
+        this.render();
+      }
+    };
+    
+    app.render();
+  </script>
+</body>
+</html>
